@@ -1,0 +1,161 @@
+---
+title: "Projet_DataViz Espérance de survie"
+author: "Sébastien BALLE, Mehdi BAKKAOUI, Thomas NAIME--PLOYON"
+date: "19 avril 2019"
+output: 
+  html_document:
+    toc: TRUE
+    number_sections: TRUE
+    code_folding: "hide"
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# On présume que les librairies sont déjà installées et on les appelle
+library(dplyr)
+library(hrbrthemes)
+library(plotly)
+library(ggridges)
+library(tidyverse)
+library(DT)
+```
+
+# Introduction
+
+Nous avons décider de travailler sur deux bases de données distinctes, qui sont la probabilité de mort d'un individus homme ou femme durant l'année X. Par conséquent, un rapide coup d'oeil aux données permet de voir que plus la personne est vieille, plus cette probabilité est élevée.
+On remarquer également que ces données reste stable durant 1914-1918 et 1939-1945. On peut en conclure que ces datasets prennent seulement en compte les morts naturels.
+  
+
+
+
+```{r cars}
+
+# On importe les datasets qui proviennent de Github
+data_f <- read.csv("https://raw.githubusercontent.com/SebastienBalle/Projet_DataViz/master/Death_Probabilities_of_Females_Since_1900.csv",sep=',',check.names=FALSE)
+data_h <- read.csv("https://raw.githubusercontent.com/SebastienBalle/Projet_DataViz/master/Death_Probability_of_Males_Since_1900.csv",sep=',',check.names=FALSE)
+
+# Pour observer un apercue des données
+datatable(data_f, rownames = FALSE, filter ="top", option = list(pageLength = 5, scrollX=T))  
+
+```
+
+Pour visualiser au mieux ces données, nous allons réaliser 4 types de graphes différents :
+  - CONNECTED SCATTER PLOT
+    Pour visualiser, pour une année et un sexe donné, l'évolution de l'espérance de décès en fonction de l'âge.
+  - AREAPLOT
+    Il est aussi intéressant d'utiliser ce type de graph qui rend plus parlant les probabilités.
+  - STACKED AREA PLOT
+    Ce type de graph nous servira pour comparer différents facteurs notamment l'espérance de décès entre l'homme et la femme pour une même année.
+  - SCATTER PLOT
+    Ce graphe, rendu intéractif, peut être très efficace pour comparer l'espérance de décés d'un même sexe au cours des années.
+    
+
+# Une première analyse des données
+
+Pour la bonne utilisation des données sur ggplot2, nous avons eu besoin de les réagencer, donc d'utiliser la fonction gather.
+
+Voici une première analyse des données en utilisant seulement l'année 1900, et qui compare les hommes et les femmes.
+
+
+```{r out.width=c('50%', '50%'), echo=FALSE, fig.show='hold'}
+
+#On trace l'évolution de la probabilité de décés de la femme en 1900
+data_f %>%  
+  gather(-Year, key = Age, value = Probabilite, convert = TRUE) %>%
+      filter(Year=="1900") %>%
+         ggplot(aes(x=Age, y=Probabilite)) +
+         geom_area(fill="skyblue", color="skyblue") +
+         geom_point() +
+         geom_line() +
+         ggtitle("Évolution de la probabilité de décés de la femme en 1900") +
+         theme_ridges()
+      
+#On trace l'évolution de la probabilité de décés de l'homme en 1900
+data_h %>%  
+  gather(-Year, key = Age, value = Probabilite, convert = TRUE) %>%
+      filter(Year=="1900") %>%
+         ggplot(aes(x=Age, y=Probabilite)) +
+         geom_area(fill="skyblue", color="skyblue") +
+         geom_point() +
+         geom_line() +
+         ggtitle("Évolution de la probabilité de décés de l'homme en 1900") +
+         theme_ridges()
+      
+
+
+```
+On peut en ressortir deux choses : qu'on avait trés peu de chances de dépasser 100 ans en 1900 (en effet, pour passer de l'année 99 à 100, il y a 50% de chances, mais également pour passer de l'année 98 à 99, etc) et qu'il y avait tout de même plus de 10% des gens qui mourrait à la naissance.
+
+
+
+
+
+
+# Une analyse plus avancée
+
+## Première comparaison
+
+Ces deux datasets permettent donc de faire au moins deux comparaisons. La première est de regarder l'évolution de la probabilité de décès d'un sexe au fil des années, et la deuxième est de regarder entre les sexes sur une ou plusieurs années choisies.
+Ici, intéréssons-nous à l'évolution de la probabilités de survie sur un sexe donné.
+
+
+```{r }
+
+# on trace le graphe montrant l'évolution de l'espérance de décès de la femme à travers les années
+data_f_inter <- data_f %>%  
+                    gather(-Year, key = Age, value = Probabilite, convert = TRUE) %>%
+                        ggplot(aes(x=Age, y=Probabilite, color=Year)) +
+                        ggtitle("L'évolution de la probabilité de mort de la femme à travers les années") +
+                        geom_point() +
+                        theme_ridges()
+ggplotly(data_f_inter)
+
+# on trace le graphe montrant l'évolution de l'espérance de décès de l'homme à travers les années
+data_h_inter <- data_h %>%  
+                    gather(-Year, key = Age, value = Probabilite, convert = TRUE) %>%
+                        ggplot(aes(x=Age, y=Probabilite, color=Year)) +
+                        ggtitle("L'évolution de la probabilité de mort de l'homme à travers les années") +
+                        geom_point() +
+                        theme_ridges()
+ggplotly(data_h_inter)
+  
+```
+
+Sur ce graphique, on voit bien une amélioration de l'espérance de vie, certainement du à l'avancée de la médecine et une meilleur hygiène générale sur terre.
+
+## Seconde comparaison
+<p style="color:red;">
+Essayons désormais de comparer l'homme et la femme, sur une même année.
+</p>
+
+```{r out.width=c('50%', '50%'), echo=FALSE, fig.show='hold' }
+
+# On trie les datasets pour pouvoir les utiliser ensuite
+data_f_sort<-gather(data_f,-Year,key=Age, value = Probabilite, convert=TRUE)
+data_h_sort<-gather(data_h,-Year,key=Age, value = Probabilite, convert=TRUE)
+
+# On filtre l'année 2010 et on compare les datasets de l'homme et de la femme
+data_f_sort1<-filter(data_f_sort,Year=="2010")
+data_h_sort1<-filter(data_h_sort,Year=="2010")
+    ggplot()+
+    ggtitle("Comparaison de l'espérance de mort entre l'homme et la femme en 2010") +
+    geom_area(data=data_h_sort1, aes(x=Age, y=Probabilite), fill='orange', color='orange', alpha=8/9) +
+    geom_area(data=data_f_sort1, aes(x=Age, y=Probabilite), fill='skyblue', color='skyblue', alpha=8/9)
+
+# On filtre l'année 1900 et on compare les datasets de l'homme et de la femme
+data_h_sort2<-filter(data_h_sort,Year=="1900")
+data_f_sort2<-filter(data_f_sort,Year=="1900")
+    ggplot()+
+    ggtitle("Comparaison de l'espérance de mort entre l'homme et la femme en 1900") +
+    geom_area(data=data_h_sort2, aes(x=Age, y=Probabilite), fill='orange', color='orange', alpha=8/9 ) +
+    geom_area(data=data_f_sort2, aes(x=Age, y=Probabilite), fill='skyblue', color='skyblue', alpha=8/9 )
+
+```
+
+On peut tirer des ces deux graphiques, plusieurs choses : <br>
+   - Plus le temps avance, plus les inégalités entre l'esprérance de décés de l'homme et la femme augmentent. En effet, il apparait bien plus d'orange sur le graphique de 2010 que sur celui de 1900,      preuve que les écarts sont plus importants.
+   - Si on regarde entre les deux graphes, on remarque une grosse différence : le pique que l'on avait en 1900 n'existe plus en 2010, preuve de plus que la médecine s'est améliorée.
+
+
