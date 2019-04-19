@@ -1,4 +1,6 @@
 # Projet_DataViz
 
-C'est un projet rÈalisÈ ‡ deux bien qu'on soit trois dans le groupe
-J'en profite pour faire une spÈciale dÈdicace ‡ mon poteau MattÈo du LycÈe Charlemagne dans le XIIËme
+Ce projet a √©t√© r√©alis√© par S√©bastien BALLE, Mehdi BAKKAOUI et Thomas NAIME-PLOYON dans le cadre du cours de data visualization de Yan Holtz durant le mois d'avril 2019 √† l'IMT Mines Ales.
+Il utilise des donn√©es trouv√©s sur [ce site](https://www.cooldatasets.com/). Ces donn√©es parlent de la probabilit√© de d√©c√®s d'une personne √† un age donn√©.
+Vous pouvez retrouvez tous les travaux r√©alis√©s sur ces donn√©es en cliquant sur le lien suivant : [Projet DataViz](https://sebastienballe.github.io/Projet_DataViz/)
+
