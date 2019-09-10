@@ -63,8 +63,8 @@ vous pouvez retrouver tous ces travaux et les datasets en cliquant [ici](https:/
 ```{r }
 
 # On importe les datasets qui proviennent de Github
-data_f <- read.csv("https://raw.githubusercontent.com/SebastienBalle/Projet_DataViz/master/Data/Death_Probabilities_of_Females_Since_1900.csv",sep=',',check.names=FALSE)
-data_h <- read.csv("https://raw.githubusercontent.com/SebastienBalle/Projet_DataViz/master/Data/Death_Probability_of_Males_Since_1900.csv",sep=',',check.names=FALSE)
+data_f <- read.csv("https://raw.githubusercontent.com/SebastienBalle/Projet_DataViz/master/Death_Probabilities_of_Females_Since_1900.csv",sep=',',check.names=FALSE)
+data_h <- read.csv("https://raw.githubusercontent.com/SebastienBalle/Projet_DataViz/master/Death_Probability_of_Males_Since_1900.csv",sep=',',check.names=FALSE)
 
 # Pour observer un apercue des données
 datatable(data_f, rownames = FALSE, filter ="top", option = list(pageLength = 5, scrollX=T))  
@@ -91,7 +91,7 @@ Pour la bonne utilisation des données sur ggplot2, nous avons eu besoin de les 
 
 Voici une première analyse des données en utilisant seulement l'année 1900, et qui compare les hommes et les femmes.
 
-```{r out.width=c('50%', '50%'), fig.show='hold'}
+```{r out.width=c('50%', '50%'), echo=FALSE, fig.show='hold'}
 
 #On trace l'évolution de la probabilité de décés de la femme en 1900
 data_f %>%  
@@ -161,7 +161,7 @@ Sur ce graphique, on voit bien une amélioration de l'espérance de vie, certain
 Essayons désormais de comparer l'homme et la femme, sur une même année.
 <br>
 
-```{r out.width=c('50%', '50%') , fig.show='hold' }
+```{r out.width=c('50%', '50%'), echo=FALSE, fig.show='hold' }
 
 # On trie les datasets pour pouvoir les utiliser ensuite
 data_f_sort<-gather(data_f,-Year,key=Age, value = Probabilite, convert=TRUE)
